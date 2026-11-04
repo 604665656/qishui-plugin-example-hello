@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "qishui-plugin-example-hello"
+version = "1.0.0"
+description = "示例插件：写新插件直接拿它当模板改"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [{ name = "604665656" }]
+dependencies = [
+  "qishui-core @ git+https://github.com/604665656/qishui-core.git@main",
+]
+
+[project.optional-dependencies]
+ui = ["PySide6>=6.5"]
+
+
+[project.scripts]
+hello = "hello.__main__:main"
+
+[project.urls]
+Homepage = "https://github.com/604665656/qishui-plugin-example-hello"
+
+[tool.setuptools]
+packages = ["hello"]

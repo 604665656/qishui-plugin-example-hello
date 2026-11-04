@@ -1,0 +1,15 @@
+{
+  "_说明": "把这个文件放到能被 raw.githubusercontent.com 访问的位置，再把地址填进 plugin.json 的 update.feed。宿主只在用户点「检查更新」时才读它。releases 是列表而不是单个 latest：用户可能想装回旧版，也可能被 pinned 在某版。sha256 留空也能装但不建议——下载被截断时只有它会告诉你。",
+  "id": "example-hello",
+  "channel": "stable",
+  "latest": "1.0.0",
+  "releases": [
+    {
+      "version": "1.0.0",
+      "date": "2026-11-04",
+      "notes": "首个开源版本",
+      "url": "",
+      "sha256": ""
+    }
+  ]
+}
