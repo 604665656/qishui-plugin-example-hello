@@ -1,19 +1,40 @@
 # -*- coding: utf-8 -*-
-"""示例插件的**独立形态**入口：`python -m hello` 或打成 独立的 exe。
-
-独立运行时它自己造 ctx（自带定时器、自己取当前账号），
-跟被宿主加载时跑的是**同一份 plugin.py**，一行没改。
-"""
+"""示例插件 插件的独立形态：python -m hello 打开界面；--task 无界面运行。"""
+import io
+import json
+import os
 import sys
 
-from qishui_core import standalone as SA
 
-from .plugin import HelloPlugin
+def _plugin_class():
+    """从 plugin.json 的 entry 取类名，避免大小写手写错。"""
+    root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    try:
+        m = json.load(io.open(os.path.join(root, "plugin.json"), encoding="utf-8"))
+        entry = m.get("entry") or ""
+        mod = entry.split(":")[0].split(".")[0] or "hello"
+        cls = entry.split(":")[-1] or "HelloPlugin"
+    except Exception:
+        mod, cls = "hello", "HelloPlugin"
+    package = __import__(mod + ".plugin", fromlist=[cls])
+    return getattr(package, cls)
 
 
-def main():
-    return SA.run_plugin_window(HelloPlugin, "example-hello",
-                                argv=sys.argv, size=(820, 560))
+def main(argv=None):
+    argv = list(argv if argv is not None else sys.argv[1:])
+    from qishui_core import standalone as SA
+    PluginClass = _plugin_class()
+    if "--task" in argv:
+        meta = SA.load_meta()
+        ctx, host = SA.make_ctx("example-hello", meta, with_scheduler=False)
+        try:
+            obj = PluginClass()
+            obj.setup(ctx)
+            r = obj.run_task()
+        finally:
+            host.stop()
+        return 0 if (r or {}).get("ok", True) else 1
+    return SA.run_plugin_window(PluginClass, "example-hello", argv=sys.argv, size=(1024, 720))
 
 
 if __name__ == "__main__":
